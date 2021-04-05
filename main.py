@@ -161,7 +161,7 @@ def startStopWatch(startTime=0):
     while True:
         # Calculating the time difference since start
         time_dif = time.time() - time_init
-        currTime = startTime + time_dif/60
+        currTime = int(startTime + time_dif/60)
 
         # Getting the string to display
         dispTime = str(currTime)
@@ -176,6 +176,9 @@ def startStopWatch(startTime=0):
                 displayDigit(digit)
             except:
                 print("error when turning on digit")
+                print(digits)
+                print("dif -",dif)
+                print("i+dif -",i+dif)
 
             time.sleep(0.000001)
             GPIO.output(digits[i+dif], 0)
@@ -280,13 +283,13 @@ def main():
 
 
 
-try:
-    main()
+#try:
+#    main()
     # print("testing numbers")
     # debugDisplay()
-finally:
+#finally:
     # Termination sequence:
-    GPIO.cleanup()
-    for process in multiprocessing.active_children():
-        process.terminate()
-        process.join()
+#    GPIO.cleanup()
+#    for process in multiprocessing.active_children():
+#        process.terminate()
+#        process.join()
