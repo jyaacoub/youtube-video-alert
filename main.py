@@ -232,11 +232,11 @@ def main():
 
                 # if the video is within 60 mins then we focus on it and no longer make requests until the hour is up
                 time_init = time.time()
+                global enable_alarm
                 while vid_delta < 60:
                     time_dif = int((time.time() - time_init)/60) # time dif in minutes.
                     vid_delta = vid_delta + time_dif
 
-                    global enable_alarm
                     # Updating color and make noise depending on how long ago it was uploaded
                     if vid_delta < 5:
                         # Set off alarm for 30 seconds if enabled
