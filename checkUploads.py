@@ -61,19 +61,8 @@ class youtubeConnection:
         response = request.execute()
         return response
 
-    def getLatestVideo(self, channelID="UCXuqSBlHAE6Xw-yeJA0Tunw"):
-        '''
-        returns the videoId of the most recent upload for a video
-        as well as a snippet for it.
-        '''
-        res = self.listChannelVideos(channelID)
-        video_res = res["items"][0]
-        video_id = video_res["id"]["videoId"]
-        snippet = video_res["snippet"]
-
-        return video_id, snippet
-
-    def getTimeSinceUpload(self, publishedAt):
+    @staticmethod
+    def getTimeSinceUpload(publishedAt):
         '''
         Takes in the publishedAt string from the API response and uses that
         to return a timedelta object since it was published.
@@ -112,10 +101,13 @@ class youtubeConnection:
                 delta (timeDelta): The time since the upload of the video
         '''
 
-        videoId, snippet = self.getLatestVideo(channelID=channelId)
-        title = snippet["title"]
+        res = self.listChannelVideos(channelId)
+        video_res = res["items"][0]
+        snippet = video_res["snippet"]
+
         delta = self.getTimeSinceUpload(publishedAt=snippet["publishedAt"])
-        return videoId, title, delta, snippet
+
+        return video_res["id"]["videoId"], snippet["title"], delta, snippet
 
     def getInfo(self, channelId="UCXuqSBlHAE6Xw-yeJA0Tunw"):
         '''

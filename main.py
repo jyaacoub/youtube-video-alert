@@ -174,28 +174,18 @@ def main():
     renderNumber.start()
 
     while True:
-        currTime = time.localtime()
-
-        # Turns off during the night:
-        if currTime.tm_hour >= 22 or currTime.tm_hour < 6:
-            displayColor(color='None')
-            if renderNumber.is_alive():
-                print("Terminating")
-                renderNumber.terminate()
-                renderNumber.join()
-                print("Alive status:", renderNumber.is_alive())
-
-                # Reseting the pins:
-                displayDigit(' ')
-
-        else:
-            # Checks video in 2 min intervals
+        currTime = time.localtime() # EST
+        # Only on for 6 hours a day from 11am to 4pm (11-16)
+        if currTime.tm_hour >= 11 or currTime.tm_hour < 16:
+            # Checks video in 5 min intervals
             if (currTime.tm_min != prevCheckTime.tm_min and
-                    currTime.tm_min % 2 == 0):
+                    currTime.tm_min % 5 == 0):
                 print("\n", time.strftime("%d %b %H:%M:%S", time.localtime()))
                 vid_delta, vid_title = YT_API.getInfo()
                 prevCheckTime = currTime
                 
+                #TODO: make this more efficent by using own time to keep track of the video when it is within an hour of uploading!
+
                 print("\t'{}' \n\tuploaded '{}' minutes ago".format(vid_title, vid_delta))
                 # only care if the video is within 60 mins of uploading
                 num_to_display = vid_delta if vid_delta < 60 else ' ' 
@@ -252,6 +242,16 @@ def main():
                     displayColor('Red')
                 else:
                     displayColor(' ') # displaying nothing
+        else:    
+            displayColor(color='None')
+            if renderNumber.is_alive():
+                print("Terminating")
+                renderNumber.terminate()
+                renderNumber.join()
+                print("Alive status:", renderNumber.is_alive())
+
+                # Reseting the pins:
+                displayDigit(' ')
 
 
 
