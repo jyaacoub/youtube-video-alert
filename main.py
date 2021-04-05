@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
-from scraper import Bot
 from gpiozero import PWMLED
+
 import multiprocessing
 from multiprocessing import Process
 import os
