@@ -193,12 +193,13 @@ def main():
                     currTime.tm_min % 2 == 0):
                 print("\n", time.strftime("%d %b %H:%M:%S", time.localtime()))
                 vid_delta, vid_title = YT_API.getInfo()
+                print("\t'{}' \n\tuploaded '{}' minutes ago".format(vid_title, vid_delta))
 
                 prevCheckTime = currTime
                 
-                # only care if the video is within 30 mins of uploading
-                num_to_display = vid_delta if vid_delta < 30 else ' ' 
-                print("\t'{}' \n\tuploaded '{}' minutes ago".format(vid_title, num_to_display))
+                # only care if the video is within 60 mins of uploading
+                num_to_display = vid_delta if vid_delta < 60 else ' ' 
+                print("\t -> under or over 60 mins?")
                 
 
                 # Terminates old process and starts a new one with the updated number:
@@ -250,7 +251,7 @@ def main():
                 elif vid_delta < 60:
                     displayColor('Red')
                 else:
-                    displayColor() # displaying nothing
+                    displayColor(' ') # displaying nothing
 
 
 
