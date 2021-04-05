@@ -161,7 +161,7 @@ def startStopWatch(startTime=0):
     while True:
         # Calculating the time difference since start
         time_dif = time.time() - time_init
-        currTime = startTime + time_dif/60
+        currTime = int(startTime + time_dif/60)
 
         # Getting the string to display
         dispTime = str(currTime)
