@@ -113,8 +113,9 @@ class youtubeConnection:
         '''
         Only important info for display
         '''
-        _, title, delta, _ = self.getLatestUpload(channelId=channelId)
+        # _, title, delta, _ = self.getLatestUpload(channelId=channelId)
 
-        time_min = int(delta.total_seconds()/60)
+        # time_min = int(delta.total_seconds()/60)
 
-        return time_min, title
+        # return time_min, title
+        return 1, "test upload (1 min)"
