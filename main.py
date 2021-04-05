@@ -115,7 +115,6 @@ def displayNum(number):
     number = str(number) # ensuring string
     numDigits = len(number)
 
-    print("Displaying number:", number)
     dif = 4-numDigits
 
     # This function should only be run as a subprocess
@@ -204,10 +203,11 @@ def main():
     while True:
         currTime = time.localtime() # EST
         # Only on for 6 hours a day from 11am to 4pm (11-16)
-        if currTime.tm_hour >= 11 or currTime.tm_hour < 16 or True: # TODO: temporary for test
-            # Checks video in 5 min intervals
-            if (currTime.tm_min != prevCheckTime.tm_min and
-                    currTime.tm_min % 5 == 0):
+        # and during that time we do checks every 5 mins
+        # TODO: get rid of true when done
+        if True or ((currTime.tm_hour >= 11 or currTime.tm_hour < 16) and 
+            (currTime.tm_min != prevCheckTime.tm_min and currTime.tm_min % 5 == 0)):
+
                 print("\n", time.strftime("%d %b %H:%M:%S", time.localtime()))
                 vid_delta, vid_title = YT_API.getInfo()
                 prevCheckTime = currTime
@@ -290,13 +290,13 @@ def main():
 
 
 
-#try:
-#    main()
+try:
+    main()
     # print("testing numbers")
     # debugDisplay()
-#finally:
+finally:
     # Termination sequence:
-#    GPIO.cleanup()
-#    for process in multiprocessing.active_children():
-#        process.terminate()
-#        process.join()
+    GPIO.cleanup()
+    for process in multiprocessing.active_children():
+        process.terminate()
+        process.join()
