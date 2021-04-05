@@ -5,6 +5,7 @@ import multiprocessing
 from multiprocessing import Process
 import os
 import time
+
 GPIO.setmode(GPIO.BCM)
 
 # GPIO ports for the 7seg pins
@@ -43,18 +44,6 @@ digitSeg = {' ': (1,1,1,1,1,1,1,1),
 red = PWMLED(5)
 green = PWMLED(6)
 blue = PWMLED(13)
-
-
-def getData():
-    bot = Bot()
-    bot.requestContent()
-    communityStatus = bot.getCommunityStatus()
-    activeCases = bot.getCases()
-    print("Community Status:|" + communityStatus + '|')
-    print("Active Cases:", activeCases)
-    bot.quit()
-    return communityStatus, activeCases
-
 
 def displayColor(color='White', brightness=0.8):
     if color == 'White':
@@ -201,7 +190,8 @@ def main():
 
 try:
     main()
-    #debugDisplay(0.25)
+    print("testing numbers")
+    debugDisplay(0.25)
 finally:
     # Termination sequence:
     GPIO.cleanup()
