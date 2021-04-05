@@ -46,36 +46,35 @@ green = PWMLED(6)
 blue = PWMLED(13)
 
 def displayColor(color='White', brightness=0.8):
-    if color == 'White':
+    color=color.lower()
+
+    if color == 'white':
         red.on()
         green.on()
         blue.on()
-    elif color == 'Red':
+    elif color == 'red':
         red.on()
         green.off()
         blue.off()
-    elif color == 'Orange':
+    elif color == 'orange':
         green.value = 0.05
         red.value = 1.0
 
         blue.off()
-    elif color == 'Yellow':
+    elif color == 'yellow':
         green.value = 0.35
         red.value = 1.0
 
         blue.off()
-    elif color == 'Green':
+    elif color == 'green':
         red.off()
         green.on()
         blue.off()
 
-    elif color == 'None':
+    else:
         red.off()
         green.off()
         blue.off()
-
-    else:
-        print("\nERROR: THAT IS NOT A COLOR\n")
 
     red.value *= brightness
     green.value *= brightness
@@ -92,7 +91,9 @@ def displayDigit(digit):
 # Bringing these low will turn on the digits 0-3 (from left to right):
 # [22] [27] [17] [24]
 def displayNum(number):
+    number = str(number) # ensuring string
     numDigits = len(number)
+    
     print("Displaying number:", number)
     dif = 4-numDigits
     # This function should only be run as a subprocess
@@ -193,9 +194,9 @@ def main():
 
 
 try:
-    main()
-    print("testing numbers")
-    debugDisplay()
+    # main()
+    # print("testing numbers")
+    # debugDisplay()
 finally:
     # Termination sequence:
     GPIO.cleanup()
