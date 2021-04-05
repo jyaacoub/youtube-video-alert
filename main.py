@@ -206,11 +206,14 @@ def main():
                 global enable_alarm
                 # Updating color and making noise depending on how long ago it was uploaded
                 if vid_delta < 5:
+                    # Set off alarm for 30 seconds if enabled
                     if enable_alarm:
-                        # Set off alarm for 30 seconds 
+                        counter=0
                         GPIO.output(alarm, 1)
-                        time.sleep(1) # TODO: change this to 30s later...
-                        GPIO.output(alarm, 0)
+                        while enable_alarm and counter < 30:
+                            time.sleep(0.5)
+                            counter += 0.5
+                    GPIO.output(alarm, 0)
 
                     # For a minute flash Green
                     for x in range(60):
