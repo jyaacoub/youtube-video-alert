@@ -53,8 +53,9 @@ shutoff = 14
 GPIO.setup(shutoff, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 def shutoff_callback(channel):
+    global enable_alarm
     enable_alarm = not enable_alarm
-    print("shutoff!")
+    print("\nToggled alarm! set to ->", enable_alarm)
 
 GPIO.add_event_detect(shutoff, GPIO.RISING, callback=shutoff_callback, bouncetime=300)
 
@@ -202,6 +203,7 @@ def main():
                 renderNumber = Process(target=displayNum, args=(str(num_to_display),))
                 renderNumber.start()
 
+                global enable_alarm
                 # Updating color and making noise depending on how long ago it was uploaded
                 if vid_delta < 5:
                     if enable_alarm:
