@@ -44,17 +44,19 @@ digitSeg = {' ': (1,1,1,1,1,1,1,1),
 
 # alarm:
 alarm = 21
+enable_alarm = True
 GPIO.setup(alarm, GPIO.OUT)
 GPIO.output(alarm, 0)
 
-#shutoff
+#shutoff for shutting off the alarm
 shutoff = 14
-GPIO.setup(shutoff, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(shutoff, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 def shutoff_callback(channel):
+    enable_alarm = not enable_alarm
     print("shutoff!")
 
-GPIO.add_event_detect(shutoff, GPIO.FALLING, callback=shutoff_callback, bouncetime=300)  
+GPIO.add_event_detect(shutoff, GPIO.RISING, callback=shutoff_callback, bouncetime=300)
 
 # lights
 red = PWMLED(5)
@@ -202,10 +204,11 @@ def main():
 
                 # Updating color and making noise depending on how long ago it was uploaded
                 if vid_delta < 5:
-                    # Set off alarm for 30 seconds 
-                    GPIO.output(alarm, 1)
-                    time.sleep(1) # TODO: change this to 30s later...
-                    GPIO.output(alarm, 0)
+                    if enable_alarm:
+                        # Set off alarm for 30 seconds 
+                        GPIO.output(alarm, 1)
+                        time.sleep(1) # TODO: change this to 30s later...
+                        GPIO.output(alarm, 0)
 
                     # For a minute flash Green
                     for x in range(60):
@@ -224,6 +227,10 @@ def main():
                         displayColor(color='None')
                         time.sleep(0.5)
                     displayColor('Green')
+
+                    # Reenabling alarm for next time
+                    enable_alarm = True
+
                 elif vid_delta < 20:
                     # display green
                     displayColor('Green')
