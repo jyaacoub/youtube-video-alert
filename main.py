@@ -49,7 +49,12 @@ GPIO.output(alarm, 0)
 
 #shutoff
 shutoff = 14
-GPIO.setup(shutoff, GPIO.IN)
+GPIO.setup(shutoff, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+def shutoff_callback(channel):
+    print("shutoff!")
+
+GPIO.add_event_detect(shutoff, GPIO.FALLING, callback=shutoff_callback, bouncetime=300)  
 
 # lights
 red = PWMLED(5)
