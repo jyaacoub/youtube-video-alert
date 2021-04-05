@@ -164,9 +164,10 @@ def main():
     currTime = time.localtime()
     prevCheckTime = currTime
 
-    # only care if the video is within 30 mins of uploading
-    num_to_display = vid_delta if vid_delta < 30 else ' ' 
-    print("latest video '{}' uploaded '{}' minutes ago".format(vid_title, num_to_display))
+    print("\t'{}' \n\tuploaded '{}' minutes ago".format(vid_title, vid_delta))
+    # only care if the video is within 60 mins of uploading
+    num_to_display = vid_delta if vid_delta < 60 else ' ' 
+    print("\t display number:", num_to_display)
 
     # Starts a subprocess to render the number on the 7-segment display
     renderNumber = Process(target=displayNum, args=(str(num_to_display),))
@@ -193,13 +194,12 @@ def main():
                     currTime.tm_min % 2 == 0):
                 print("\n", time.strftime("%d %b %H:%M:%S", time.localtime()))
                 vid_delta, vid_title = YT_API.getInfo()
-                print("\t'{}' \n\tuploaded '{}' minutes ago".format(vid_title, vid_delta))
-
                 prevCheckTime = currTime
                 
+                print("\t'{}' \n\tuploaded '{}' minutes ago".format(vid_title, vid_delta))
                 # only care if the video is within 60 mins of uploading
                 num_to_display = vid_delta if vid_delta < 60 else ' ' 
-                print("\t -> under or over 60 mins?")
+                print("\t display number:", num_to_display)
                 
 
                 # Terminates old process and starts a new one with the updated number:
