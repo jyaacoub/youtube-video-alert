@@ -239,6 +239,7 @@ def main():
 
                     # Updating color and make noise depending on how long ago it was uploaded
                     if vid_delta < 5:
+                        displayColor('Green')
                         # Set off alarm for 30 seconds if enabled
                         if enable_alarm:
                             counter=0
@@ -256,6 +257,7 @@ def main():
                             time.sleep(0.5)
 
                         displayColor('Green')
+
                     elif vid_delta < 10:
                         # Just flash green
                         # For a minute flash Green
