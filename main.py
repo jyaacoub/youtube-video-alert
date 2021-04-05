@@ -154,6 +154,32 @@ def debugDisplay(speed=None):
                 GPIO.output(segment, 1)
                 x += 1
 
+def startStopWatch(startTime=0):
+    time_init = time.time()
+    
+    # This function should only be run as a subprocess
+    while True:
+        # Calculating the time difference since start
+        time_dif = time.time() - time_init
+        currTime = startTime + time_dif/60
+
+        # Getting the string to display
+        dispTime = str(currTime)
+        numDigits = len(dispTime)
+        dif = 4-numDigits
+
+        for i, digit in enumerate(dispTime):
+            # Turning on the right digits:
+            try:
+                GPIO.output(digits[i+dif], 1)
+                # Displaying the digit:
+                displayDigit(digit)
+            except:
+                print("error when turning on digit")
+
+            time.sleep(0.000001)
+            GPIO.output(digits[i+dif], 0)
+
 
 def main(): 
     print("\n Start Time:", time.strftime("%d %b %H:%M:%S", time.localtime()))
@@ -190,7 +216,6 @@ def main():
                 # only care if the video is within 60 mins of uploading
                 num_to_display = vid_delta if vid_delta < 60 else ' ' 
                 print("\t display number:", num_to_display)
-                
 
                 # Terminates old process and starts a new one with the updated number:
                 renderNumber.terminate()
@@ -200,7 +225,7 @@ def main():
                 renderNumber.start()
 
                 global enable_alarm
-                # Updating color and making noise depending on how long ago it was uploaded
+                # Updating color and make noise depending on how long ago it was uploaded
                 if vid_delta < 5:
                     # Set off alarm for 30 seconds if enabled
                     if enable_alarm:
