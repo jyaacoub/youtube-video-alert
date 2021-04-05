@@ -203,11 +203,14 @@ def main():
     while True:
         currTime = time.localtime() # EST
         # Only on for 6 hours a day from 11am to 4pm (11-16)
-        # and during that time we do checks every 5 mins
-        # TODO: get rid of true when done
-        if True or ((currTime.tm_hour >= 11 or currTime.tm_hour < 16) and 
-            (currTime.tm_min != prevCheckTime.tm_min and currTime.tm_min % 5 == 0)):
+        # and during that time we do checks every 4 mins 
 
+        # Reason -> we have 10k units per day means we can only perform a max of 99 searches 
+        #       (100 units for seach and 1 for video.list)
+        #       and the likely time for uploads is between 10 and 16 (exclusive) which is 6 hrs (360 mins).
+        #       So we can do a search roughly once every 3.6 minutes which we round up to 4 minutes.
+        if ((currTime.tm_hour >= 10 or currTime.tm_hour < 16) and 
+            (currTime.tm_min != prevCheckTime.tm_min and currTime.tm_min % 4 == 0)):
                 print("\n", time.strftime("%d %b %H:%M:%S", time.localtime()))
                 vid_delta, vid_title = YT_API.getInfo()
                 prevCheckTime = currTime
@@ -237,7 +240,6 @@ def main():
                 while vid_delta < 60:
                     time_dif = int((time.time() - time_init)/60) # time dif in minutes.
                     vid_delta = start_delta + time_dif
-                    print("vid_delta -", vid_delta)
 
                     # Updating color and make noise depending on how long ago it was uploaded
                     if vid_delta < 5:
@@ -296,8 +298,6 @@ def main():
 
 try:
     main()
-    # print("testing numbers")
-    # debugDisplay()
 finally:
     # Termination sequence:
     GPIO.cleanup()
