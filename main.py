@@ -7,6 +7,8 @@ import os
 import time
 import datetime
 
+from checkUploads import youtubeConnection
+
 GPIO.setmode(GPIO.BCM)
 
 # GPIO ports for the 7seg pins
@@ -155,7 +157,10 @@ def debugDisplay(speed=None):
 
 def main(): 
     print("\n Start Time:", time.strftime("%d %b %H:%M:%S", time.localtime()))
-    vid_delta, vid_title = int(datetime.timedelta().total_seconds()/60), "some video title" #TODO: replace with call to API
+    # setting up connection
+    YT_API = youtubeConnection()
+    # getting info
+    vid_delta, vid_title = YT_API.getInfo()
     currTime = time.localtime()
     prevCheckTime = currTime
 
@@ -187,7 +192,7 @@ def main():
             if (currTime.tm_min != prevCheckTime.tm_min and
                     currTime.tm_min % 2 == 0):
                 print("\n", time.strftime("%d %b %H:%M:%S", time.localtime()))
-                vid_delta, vid_title = int(datetime.timedelta().total_seconds()/60), "some video title" #TODO: replace with call to API
+                vid_delta, vid_title = YT_API.getInfo()
 
                 prevCheckTime = currTime
                 
@@ -249,13 +254,13 @@ def main():
 
 
 
-# try:
-#     # main()
-#     # print("testing numbers")
-#     # debugDisplay()
-# finally:
-#     # Termination sequence:
-#     GPIO.cleanup()
-#     for process in multiprocessing.active_children():
-#         process.terminate()
-#         process.join()
+try:
+    main()
+    # print("testing numbers")
+    # debugDisplay()
+finally:
+    # Termination sequence:
+    GPIO.cleanup()
+    for process in multiprocessing.active_children():
+        process.terminate()
+        process.join()
