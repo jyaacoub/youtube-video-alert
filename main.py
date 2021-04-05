@@ -110,7 +110,7 @@ def displayNum(number):
             GPIO.output(digits[i+dif], 0)
 
 
-def debugDisplay(speed=1):
+def debugDisplay(speed=None):
     while True:
         for segment in segments:
             x = 0
@@ -122,7 +122,11 @@ def debugDisplay(speed=1):
                 GPIO.output(digit, 1)
                 GPIO.output(segment, 0)
 
-                time.sleep(speed)
+                if speed==None:
+                    input()
+                else:
+                    time.sleep(speed)
+
                 GPIO.output(digit, 0)
                 GPIO.output(segment, 1)
                 x += 1
@@ -191,7 +195,7 @@ def main():
 try:
     main()
     print("testing numbers")
-    debugDisplay(0.25)
+    debugDisplay()
 finally:
     # Termination sequence:
     GPIO.cleanup()
