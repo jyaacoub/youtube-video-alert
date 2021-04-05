@@ -5,6 +5,7 @@ import multiprocessing
 from multiprocessing import Process
 import os
 import time
+import datetime
 
 GPIO.setmode(GPIO.BCM)
 
@@ -41,6 +42,16 @@ digitSeg = {' ': (1,1,1,1,1,1,1,1),
             '8': (0,0,0,0,0,0,0,1),
             '9': (0,0,0,0,1,0,0,1)}
 
+# alarm:
+alarm = 21
+GPIO.setup(alarm, GPIO.OUT)
+GPIO.output(alarm, 0)
+
+#shutoff
+shutoff = 14
+GPIO.setup(shutoff, GPIO.IN)
+
+# lights
 red = PWMLED(5)
 green = PWMLED(6)
 blue = PWMLED(13)
@@ -93,9 +104,10 @@ def displayDigit(digit):
 def displayNum(number):
     number = str(number) # ensuring string
     numDigits = len(number)
-    
+
     print("Displaying number:", number)
     dif = 4-numDigits
+
     # This function should only be run as a subprocess
     while True:
         for i, digit in enumerate(number):
@@ -107,7 +119,7 @@ def displayNum(number):
             except:
                 print("error when turning on digit")
 
-            time.sleep(0.00001)
+            time.sleep(0.000001)
             GPIO.output(digits[i+dif], 0)
 
 
@@ -133,73 +145,100 @@ def debugDisplay(speed=None):
                 x += 1
 
 
-def main():
-    print("started")
-    # print("\n", time.strftime("%d %b %H:%M:%S", time.localtime()))
-    # communityStatus, activeCases = getData()
-    # currTime = time.localtime()
-    # prevCheckTime = currTime
-    # prevActiveCases = activeCases
+def main(): 
+    print("\n Start Time:", time.strftime("%d %b %H:%M:%S", time.localtime()))
+    vid_delta, vid_title = int(datetime.timedelta().total_seconds()/60), "some video title" #TODO: replace with call to API
+    currTime = time.localtime()
+    prevCheckTime = currTime
 
-    # # Starts a subprocess to render the number on the 7-segment display
-    # renderNumber = Process(target=displayNum, args=(str(activeCases),))
-    # renderNumber.start()
-    # displayColor(color=communityStatus)
+    # only care if the video is within 30 mins of uploading
+    num_to_display = vid_delta if vid_delta < 30 else ' ' 
+    print("latest video '{}' uploaded '{}' minutes ago".format(vid_title, num_to_display))
 
-    # while True:
-    #     currTime = time.localtime()
+    # Starts a subprocess to render the number on the 7-segment display
+    renderNumber = Process(target=displayNum, args=(str(num_to_display),))
+    renderNumber.start()
 
-    #     # Turns off during the night:
-    #     if currTime.tm_hour >= 22 or currTime.tm_hour < 6:
-    #         displayColor(color='None')
-    #         if renderNumber.is_alive():
-    #             print("Terminating")
-    #             renderNumber.terminate()
-    #             renderNumber.join()
-    #             print("Alive status:", renderNumber.is_alive())
+    while True:
+        currTime = time.localtime()
 
-    #             # Reseting the pins:
-    #             displayDigit(' ')
+        # Turns off during the night:
+        if currTime.tm_hour >= 22 or currTime.tm_hour < 6:
+            displayColor(color='None')
+            if renderNumber.is_alive():
+                print("Terminating")
+                renderNumber.terminate()
+                renderNumber.join()
+                print("Alive status:", renderNumber.is_alive())
 
-    #     else:
-    #         # Checks the cases every 15 min
-    #         if (currTime.tm_min != prevCheckTime.tm_min and
-    #                 currTime.tm_min % 15 == 0):
+                # Reseting the pins:
+                displayDigit(' ')
 
-    #             print("\n", time.strftime("%d %b %H:%M:%S", time.localtime()))
-    #             communityStatus, activeCases = getData()
-    #             prevCheckTime = currTime
+        else:
+            # Checks video in 2 min intervals
+            if (currTime.tm_min != prevCheckTime.tm_min and
+                    currTime.tm_min % 2 == 0):
+                print("\n", time.strftime("%d %b %H:%M:%S", time.localtime()))
+                vid_delta, vid_title = int(datetime.timedelta().total_seconds()/60), "some video title" #TODO: replace with call to API
 
-    #             # Only terminates if the new number is different
-    #             if (prevActiveCases != activeCases or
-    #                  not renderNumber.is_alive()):
-    #                 prevActiveCases = activeCases
+                prevCheckTime = currTime
+                
+                # only care if the video is within 30 mins of uploading
+                num_to_display = vid_delta if vid_delta < 30 else ' ' 
+                print("\t'{}' \n\tuploaded '{}' minutes ago".format(vid_title, num_to_display))
+                
 
-    #                 # Terminates old process and starts a new one with the updated number:
-    #                 renderNumber.terminate()
-    #                 renderNumber.join()
+                # Terminates old process and starts a new one with the updated number:
+                renderNumber.terminate()
+                renderNumber.join()
+                
+                renderNumber = Process(target=displayNum, args=(str(num_to_display),))
+                renderNumber.start()
 
-    #                 renderNumber = Process(target=displayNum, args=(str(activeCases),))
-    #                 renderNumber.start()
+                # Updating color and making noise depending on how long ago it was uploaded
+                if vid_delta < 5:
+                    # Set off alarm for 30 seconds 
+                    GPIO.output(alarm, 1)
+                    time.sleep(1) # TODO: change this to 30s later...
+                    GPIO.output(alarm, 0)
 
-    #                 # Flashes the color to show that the number has been updated
-    #                 for x in range(60):
-    #                     displayColor(color='White', brightness=1.0)
-    #                     time.sleep(0.5)
-    #                     displayColor(color='None')
-    #                     time.sleep(0.5)
+                    # For a minute flash Green
+                    for x in range(60):
+                        displayColor(color='Green', brightness=1.0)
+                        time.sleep(0.5)
+                        displayColor(color='None')
+                        time.sleep(0.5)
 
-    #             # Updates the color:
-    #             displayColor(color=communityStatus)
+                    displayColor('Green')
+                elif vid_delta < 10:
+                    # Just flash green
+                    # For a minute flash Green
+                    for x in range(60):
+                        displayColor(color='Green', brightness=1.0)
+                        time.sleep(0.5)
+                        displayColor(color='None')
+                        time.sleep(0.5)
+                    displayColor('Green')
+                elif vid_delta < 20:
+                    # display green
+                    displayColor('Green')
+                elif vid_delta < 30:
+                    # display yellow
+                    displayColor('Yellow')
+                elif vid_delta < 60:
+                    displayColor('Red')
+                else:
+                    displayColor() # displaying nothing
 
 
-try:
-    # main()
-    # print("testing numbers")
-    # debugDisplay()
-finally:
-    # Termination sequence:
-    GPIO.cleanup()
-    for process in multiprocessing.active_children():
-        process.terminate()
-        process.join()
+
+# try:
+#     # main()
+#     # print("testing numbers")
+#     # debugDisplay()
+# finally:
+#     # Termination sequence:
+#     GPIO.cleanup()
+#     for process in multiprocessing.active_children():
+#         process.terminate()
+#         process.join()
