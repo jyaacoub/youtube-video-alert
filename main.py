@@ -209,80 +209,80 @@ def main():
         #       (100 units for seach and 1 for video.list)
         #       and the likely time for uploads is between 10 and 16 (exclusive) which is 6 hrs (360 mins).
         #       So we can do a search roughly once every 3.6 minutes which we round up to 4 minutes.
-        if ((currTime.tm_hour >= 10 and currTime.tm_hour < 16):
-            if (currTime.tm_min != prevCheckTime.tm_min and currTime.tm_min % 4 == 0)):
-                    print("\n", time.strftime("%d %b %H:%M:%S", time.localtime()))
-                    vid_delta, vid_title = YT_API.getInfo()
-                    prevCheckTime = currTime
-                    print("\t'{}' \n\tuploaded '{}' minutes ago".format(vid_title, vid_delta))
+        if (currTime.tm_hour >= 10 and currTime.tm_hour < 16):
+            if (currTime.tm_min != prevCheckTime.tm_min and currTime.tm_min % 4 == 0):
+                print("\n", time.strftime("%d %b %H:%M:%S", time.localtime()))
+                vid_delta, vid_title = YT_API.getInfo()
+                prevCheckTime = currTime
+                print("\t'{}' \n\tuploaded '{}' minutes ago".format(vid_title, vid_delta))
 
-                    # displaying number as a subprocess:
-                    if vid_delta < 60:
-                        # Terminates old process and starts a new one with a stopwatch:
-                        renderNumber.terminate()
-                        renderNumber.join()
+                # displaying number as a subprocess:
+                if vid_delta < 60:
+                    # Terminates old process and starts a new one with a stopwatch:
+                    renderNumber.terminate()
+                    renderNumber.join()
 
-                        renderNumber = Process(target=startStopWatch, args=(vid_delta,))
-                        renderNumber.start()
+                    renderNumber = Process(target=startStopWatch, args=(vid_delta,))
+                    renderNumber.start()
+                else:
+                    num_to_display = ' '
+                    # Terminates old process and starts a new one that clears the pins:
+                    renderNumber.terminate()
+                    renderNumber.join()
+
+                    renderNumber = Process(target=displayNum, args=(str(num_to_display),))
+                    renderNumber.start()                
+
+                # if the video is within 60 mins then we focus on it and no longer make requests until the hour is up
+                time_init = time.time()
+                start_delta = vid_delta
+                global enable_alarm
+                while vid_delta < 60:
+                    time_dif = int((time.time() - time_init)/60) # time dif in minutes.
+                    vid_delta = start_delta + time_dif
+
+                    # Updating color and make noise depending on how long ago it was uploaded
+                    if vid_delta < 5:
+                        displayColor('Green')
+                        # Set off alarm for 30 seconds if enabled
+                        if enable_alarm:
+                            counter=0
+                            GPIO.output(alarm, 1)
+                            while enable_alarm and counter < 30:
+                                time.sleep(0.5)
+                                counter += 0.5
+                        GPIO.output(alarm, 0)
+
+                        # For a minute flash Green
+                        for x in range(60):
+                            displayColor(color='Green', brightness=1.0)
+                            time.sleep(0.5)
+                            displayColor(color='None')
+                            time.sleep(0.5)
+
+                        displayColor('Green')
+
+                    elif vid_delta < 10:
+                        # Just flash green
+                        # For a minute flash Green
+                        for x in range(60):
+                            displayColor(color='Green', brightness=1.0)
+                            time.sleep(0.5)
+                            displayColor(color='None')
+                            time.sleep(0.5)
+                        displayColor('Green')
+                    elif vid_delta < 20:
+                        # display green
+                        displayColor('Green')
+                    elif vid_delta < 30:
+                        # display yellow
+                        displayColor('Yellow')
+                    elif vid_delta < 60:
+                        displayColor('Red')
                     else:
-                        num_to_display = ' '
-                        # Terminates old process and starts a new one that clears the pins:
-                        renderNumber.terminate()
-                        renderNumber.join()
-
-                        renderNumber = Process(target=displayNum, args=(str(num_to_display),))
-                        renderNumber.start()                
-
-                    # if the video is within 60 mins then we focus on it and no longer make requests until the hour is up
-                    time_init = time.time()
-                    start_delta = vid_delta
-                    global enable_alarm
-                    while vid_delta < 60:
-                        time_dif = int((time.time() - time_init)/60) # time dif in minutes.
-                        vid_delta = start_delta + time_dif
-
-                        # Updating color and make noise depending on how long ago it was uploaded
-                        if vid_delta < 5:
-                            displayColor('Green')
-                            # Set off alarm for 30 seconds if enabled
-                            if enable_alarm:
-                                counter=0
-                                GPIO.output(alarm, 1)
-                                while enable_alarm and counter < 30:
-                                    time.sleep(0.5)
-                                    counter += 0.5
-                            GPIO.output(alarm, 0)
-
-                            # For a minute flash Green
-                            for x in range(60):
-                                displayColor(color='Green', brightness=1.0)
-                                time.sleep(0.5)
-                                displayColor(color='None')
-                                time.sleep(0.5)
-
-                            displayColor('Green')
-
-                        elif vid_delta < 10:
-                            # Just flash green
-                            # For a minute flash Green
-                            for x in range(60):
-                                displayColor(color='Green', brightness=1.0)
-                                time.sleep(0.5)
-                                displayColor(color='None')
-                                time.sleep(0.5)
-                            displayColor('Green')
-                        elif vid_delta < 20:
-                            # display green
-                            displayColor('Green')
-                        elif vid_delta < 30:
-                            # display yellow
-                            displayColor('Yellow')
-                        elif vid_delta < 60:
-                            displayColor('Red')
-                        else:
-                            displayColor(' ') # displaying nothing
-                            # Reenabling alarm for next time
-                            enable_alarm = True
+                        displayColor(' ') # displaying nothing
+                        # Reenabling alarm for next time
+                        enable_alarm = True
         else:    
             displayColor(color='None')
             if renderNumber.is_alive():
