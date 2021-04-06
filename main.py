@@ -209,7 +209,7 @@ def main():
         #       (100 units for seach and 1 for video.list)
         #       and the likely time for uploads is between 10 and 16 (exclusive) which is 6 hrs (360 mins).
         #       So we can do a search roughly once every 3.6 minutes which we round up to 4 minutes.
-        if ((currTime.tm_hour >= 10 or currTime.tm_hour < 16) and 
+        if ((currTime.tm_hour >= 10 and currTime.tm_hour < 16) and 
             (currTime.tm_min != prevCheckTime.tm_min and currTime.tm_min % 4 == 0)):
                 print("\n", time.strftime("%d %b %H:%M:%S", time.localtime()))
                 vid_delta, vid_title = YT_API.getInfo()
