@@ -202,7 +202,7 @@ def main():
 
     while True:
         currTime = time.localtime() # EST
-        # Only on for 6 hours a day from 11am to 4pm (11-16)
+        # Only on for 6 hours a day from 10am to 4pm (10-16)
         # and during that time we do checks every 4 mins 
 
         # Reason -> we have 10k units per day means we can only perform a max of 99 searches 
