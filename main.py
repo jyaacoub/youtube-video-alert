@@ -165,7 +165,7 @@ def startStopWatch(startTime=0):
         # Getting the string to display
         dispTime = str(currTime)
         numDigits = len(dispTime)
-        dif = 4-numDigits
+        dif = 4 - numDigits
 
         for i, digit in enumerate(dispTime):
             # Turning on the right digits:
@@ -279,10 +279,10 @@ def main():
                         displayColor('Yellow')
                     elif vid_delta < 60:
                         displayColor('Red')
-                    else:
-                        displayColor(' ') # displaying nothing
                         # Reenabling alarm for next time
                         enable_alarm = True
+                    else:
+                        displayColor(' ') # displaying nothing
         else:    
             displayColor(color='None')
             if renderNumber.is_alive():
