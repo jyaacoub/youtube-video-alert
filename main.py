@@ -216,28 +216,28 @@ def main():
                 prevCheckTime = currTime
                 print("\t'{}' \n\tuploaded '{}' minutes ago".format(vid_title, vid_delta))
 
-                # displaying number as a subprocess:
-                if vid_delta < 60:
-                    # Terminates old process and starts a new one with a stopwatch:
+                
+                # Terminates old process
+                if renderNumber.is_alive():
                     renderNumber.terminate()
                     renderNumber.join()
-
+                
+                # displaying number as a subprocess:
+                if vid_delta <= 60:
+                    # Starts a new one with a stopwatch:
+                    print("starting Stopwatch")
                     renderNumber = Process(target=startStopWatch, args=(vid_delta,))
                     renderNumber.start()
                 else:
-                    num_to_display = ' '
-                    # Terminates old process and starts a new one that clears the pins:
-                    renderNumber.terminate()
-                    renderNumber.join()
-
-                    renderNumber = Process(target=displayNum, args=(str(num_to_display),))
-                    renderNumber.start()                
+                    # clears the pins:
+                    print("stopping stopwatch")
+                    displayDigit(' ') # reseting pins
 
                 # if the video is within 60 mins then we focus on it and no longer make requests until the hour is up
                 time_init = time.time()
                 start_delta = vid_delta
                 global enable_alarm
-                while vid_delta < 60:
+                while vid_delta <= 60:
                     time_dif = int((time.time() - time_init)/60) # time dif in minutes.
                     vid_delta = start_delta + time_dif
 
@@ -263,7 +263,6 @@ def main():
                         displayColor('Green')
 
                     elif vid_delta < 10:
-                        # Just flash green
                         # For a minute flash Green
                         for x in range(60):
                             displayColor(color='Green', brightness=1.0)
