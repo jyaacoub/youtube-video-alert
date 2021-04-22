@@ -202,14 +202,14 @@ def main():
 
     while True:
         currTime = time.localtime() # EST
-        # Only on for 6 hours a day from 11am to 5pm (11-17)
+        # Only on for 6 hours a day from 12pm to 6pm (12-18)
         # and during that time we do checks every 4 mins 
 
         # Reason -> we have 10k units per day means we can only perform a max of 99 searches 
         #       (100 units for seach and 1 for video.list)
-        #       and the likely time for uploads is between 11 and 17 (exclusive) which is 6 hrs (360 mins).
+        #       and the likely time for uploads is between 12 and 18 (exclusive) which is 6 hrs (360 mins).
         #       So we can do a search roughly once every 3.6 minutes which we round up to 4 minutes.
-        if (currTime.tm_hour >= 11 and currTime.tm_hour < 17):
+        if (currTime.tm_hour >= 12 and currTime.tm_hour < 18):
             if (currTime.tm_min != prevCheckTime.tm_min and currTime.tm_min % 4 == 0):
                 print("\n", time.strftime("%d %b %H:%M:%S", time.localtime()))
                 vid_delta, vid_title = YT_API.getInfo()

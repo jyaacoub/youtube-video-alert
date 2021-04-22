@@ -120,5 +120,3 @@ class youtubeConnection:
         except:
             print("Error in YT_API")
             return 61, "ran out of units!"
-
-        
